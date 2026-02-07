@@ -19,8 +19,8 @@ function parseEnv(raw) {
   return result;
 }
 
-let apiBaseUrl = 'https://dryapi.onrender.com';
-if (fs.existsSync(envPath)) {
+let apiBaseUrl = process.env.API_BASE_URL || 'https://dryapi.onrender.com';
+if (!process.env.API_BASE_URL && fs.existsSync(envPath)) {
   const raw = fs.readFileSync(envPath, 'utf8');
   const env = parseEnv(raw);
   if (env.API_BASE_URL) {
