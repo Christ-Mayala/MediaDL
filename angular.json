@@ -58,7 +58,7 @@
           },
           "configurations": {
             "production": {
-              "serviceWorker": true,
+              "serviceWorker": false,
               "budgets": [
                 {
                   "type": "initial",
