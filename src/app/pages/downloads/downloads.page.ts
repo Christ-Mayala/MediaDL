@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subscription, catchError, finalize, of, switchMap, timer } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ApiService } from '../../api/api.service';
+import { YoutubeDownloaderService, YoutubeMetadata } from '../../services/youtube-downloader.service';
 import { DownloadItem, MediaType } from '../../api/types';
 import { AuthService } from '../../auth/auth.service';
 import { TruncateUrlPipe } from '../../pipes/truncate-url.pipe';
@@ -25,12 +26,15 @@ export class DownloadsPageComponent implements OnInit, OnDestroy {
   actionSuccess = '';
   loadingStart = false;
   actionLoading: Record<string, string> = {};
-
   page = 1;
   limit = 10;
   pollIntervalMs = 7000;
   private pollSub?: Subscription;
   private mediaTypeSub?: Subscription;
+
+  // Afficher les métadonnées YouTube dans l'UI (optionnel)
+  displayYoutubeMetadata?: YoutubeMetadata;
+  showMetadataPreview = false;
 
   form = this.fb.nonNullable.group({
     url: ['', [Validators.required]],
@@ -39,7 +43,7 @@ export class DownloadsPageComponent implements OnInit, OnDestroy {
     maxHeight: [1080]
   });
 
-  constructor(private fb: FormBuilder, private api: ApiService, private auth: AuthService) {}
+  constructor(private fb: FormBuilder, private api: ApiService, private auth: AuthService, private youtubeDownloader: YoutubeDownloaderService) {}
 
   ngOnInit() {
     this.startPolling();
@@ -71,6 +75,21 @@ export class DownloadsPageComponent implements OnInit, OnDestroy {
     this.fetchDownloads().subscribe((res) => this.handleListResponse(res));
   }
 
+  /**
+   * Afficher un aperçu des métadonnées YouTube
+   */
+  showYoutubeMetadataPreview(metadata: YoutubeMetadata) {
+    this.displayYoutubeMetadata = metadata;
+    this.showMetadataPreview = true;
+  }
+
+  /**
+   * Masquer l'aperçu des métadonnées
+   */
+  hideMetadataPreview() {
+    this.showMetadataPreview = false;
+  }
+
   submitStart() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -81,13 +100,57 @@ export class DownloadsPageComponent implements OnInit, OnDestroy {
     this.startError = '';
     this.actionSuccess = '';
     const raw = this.form.getRawValue();
+    const url = raw.url.trim();
+
+    // Vérifier si c'est une URL YouTube
+    if (this.isYoutubeUrl(url)) {
+      this.downloadYoutubeVideo(url, raw.mediaType as MediaType, raw.filename);
+    } else {
+      // Utiliser l'ancienne méthode pour les autres plateformes
+      this.downloadOtherPlatform(url, raw.mediaType as MediaType, raw.filename, raw.maxHeight);
+    }
+  }
+
+  /**
+   * Télécharger une vidéo YouTube côté client
+   */
+  private async downloadYoutubeVideo(url: string, mediaType: MediaType, filename?: string) {
+    try {
+      this.actionSuccess = 'Préparation du téléchargement YouTube...';
+      
+      // Récupérer les métadonnées
+      const metadata = await this.youtubeDownloader.getVideoMetadata(url);
+      this.showYoutubeMetadataPreview(metadata);
+      
+      this.actionSuccess = `Téléchargement de "${metadata.title}"...`;
+      
+      // Convertir MediaType en 'video' | 'audio' pour le service
+      const youtubeMediaType = mediaType === 'image' ? 'video' : mediaType;
+      
+      // Lancer le téléchargement côté client
+      await this.youtubeDownloader.downloadVideo(url, filename || this.sanitizeFilename(metadata.title), youtubeMediaType);
+      
+      this.hideMetadataPreview();
+      this.actionSuccess = `Téléchargement de "${metadata.title}" terminé !`;
+      this.refreshNow();
+      
+    } catch (error: any) {
+      this.startError = error?.message || 'Erreur lors du téléchargement YouTube.';
+      this.loadingStart = false;
+    }
+  }
+
+  /**
+   * Télécharger depuis les autres plateformes (ancienne méthode)
+   */
+  private downloadOtherPlatform(url: string, mediaType: MediaType, filename?: string, maxHeight?: number) {
     const payload = {
-      url: raw.url.trim(),
-      mediaType: raw.mediaType as MediaType,
-      filename: raw.filename.trim() || undefined,
+      url: url.trim(),
+      mediaType: mediaType,
+      filename: filename?.trim() || undefined,
       maxHeight:
-        raw.mediaType === 'video' && raw.maxHeight && Number(raw.maxHeight) > 0
-          ? Number(raw.maxHeight)
+        mediaType === 'video' && maxHeight && Number(maxHeight) > 0
+          ? Number(maxHeight)
           : undefined
     };
 
@@ -108,6 +171,23 @@ export class DownloadsPageComponent implements OnInit, OnDestroy {
           this.startError = err?.error?.message || 'Échec du téléchargement.';
         }
       });
+  }
+
+  /**
+   * Vérifier si l'URL est YouTube
+   */
+  private isYoutubeUrl(url: string): boolean {
+    return url.includes('youtube.com') || url.includes('youtu.be');
+  }
+
+  /**
+   * Nettoyer le nom de fichier
+   */
+  private sanitizeFilename(title: string): string {
+    return title
+      .replace(/[<>:"/\\|?*]/g, '_')
+      .substring(0, 80)
+      .trim() || 'video';
   }
 
   statusClass(status?: string) {
@@ -131,6 +211,12 @@ export class DownloadsPageComponent implements OnInit, OnDestroy {
     const value = (status || 'pending').toLowerCase();
     if (value.includes('run')) return 'en cours';
     if (value.includes('done') || value.includes('complete')) return 'termine';
+    if (value.includes('cancel')) {
+      return 'error';
+    }
+    if (value.includes('error') || value.includes('fail')) {
+      return 'erreur';
+    }
     if (value.includes('cancel')) return 'annule';
     if (value.includes('error') || value.includes('fail')) return 'erreur';
     return 'en attente';

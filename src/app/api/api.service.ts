@@ -49,6 +49,31 @@ export class ApiService {
     });
   }
 
+  // YouTube metadata endpoint
+  getYoutubeMetadata(url: string) {
+    return this.http.post<{
+      success: boolean;
+      data?: {
+        title: string;
+        duration: number;
+        thumbnail: string;
+        author: string;
+        viewCount: number;
+        publishDate: string;
+        description: string;
+        formats: Array<{
+          quality: string;
+          container: string;
+          hasVideo: boolean;
+          hasAudio: boolean;
+          resolution: string;
+          bitrate: string;
+        }>;
+      };
+      error?: string;
+    }>(`${this.baseUrl}/downloads/youtube/metadata`, { url });
+  }
+
   cancelDownload(id: string) {
     return this.http.post<ApiResponse<any>>(`${this.baseUrl}/downloads/${id}/cancel`, {});
   }
