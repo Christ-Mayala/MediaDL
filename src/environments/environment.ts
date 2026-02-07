@@ -1,4 +1,6 @@
+const runtimeEnv = (window as any).__env || {};
+
 export const environment = {
-  apiBaseUrl: 'http://localhost:5000',
+  apiBaseUrl: runtimeEnv.API_BASE_URL || 'https://dryapi.onrender.com',
   appSlug: 'mediadl'
 };
