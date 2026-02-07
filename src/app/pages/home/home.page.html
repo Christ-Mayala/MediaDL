@@ -1,0 +1,160 @@
+<section class="home-shell">
+  <div class="hero">
+    <div class="hero-content">
+      <div class="hero-text">
+        <p class="hero-eyebrow">MediaDL</p>
+        <h1 class="hero-title">Le téléchargement intelligent, sans perte de qualité.</h1>
+        <p class="hero-description">
+          Téléchargez vidéos, musiques et images depuis YouTube, Instagram, TikTok,
+          Facebook et plus. Suivi en temps réel, lien direct et suppression automatique.
+        </p>
+        <div class="hero-actions">
+          <button class="btn primary large" (click)="goToAuth()" *ngIf="!isAuthenticated">
+            <lucide-icon name="rocket" size="18"></lucide-icon>
+            Commencer gratuitement
+          </button>
+          <button class="btn primary large" (click)="goToDownloads()" *ngIf="isAuthenticated">
+            <lucide-icon name="download" size="18"></lucide-icon>
+            Mes téléchargements
+          </button>
+          <button class="btn outline large" (click)="scrollToFeatures()">
+            <lucide-icon name="play" size="18"></lucide-icon>
+            Voir le guide
+          </button>
+        </div>
+        <div class="hero-note">
+          <lucide-icon name="shield" size="16"></lucide-icon>
+          Liens privés et suppression automatique après téléchargement.
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="card-stack">
+          <div class="preview-card">
+            <div class="card-head">
+              <lucide-icon name="youtube" size="22"></lucide-icon>
+              <div>
+                <div class="card-title">YouTube</div>
+                <div class="card-sub">Vidéo terminée</div>
+              </div>
+            </div>
+            <div class="card-progress">
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 100%"></div>
+              </div>
+              <span class="progress-text">100%</span>
+            </div>
+            <div class="badge success">
+              <lucide-icon name="circle-check-big" size="14"></lucide-icon>
+              Terminé
+            </div>
+          </div>
+
+          <div class="preview-card">
+            <div class="card-head">
+              <lucide-icon name="instagram" size="22"></lucide-icon>
+              <div>
+                <div class="card-title">Instagram</div>
+                <div class="card-sub">En cours</div>
+              </div>
+            </div>
+            <div class="card-progress">
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 72%"></div>
+              </div>
+              <span class="progress-text">72%</span>
+            </div>
+            <div class="badge running">
+              <lucide-icon name="clock" size="14"></lucide-icon>
+              Téléchargement
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="features" id="features">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Pourquoi choisir MediaDL</h2>
+        <p class="section-subtitle">Un flux simple, rapide et propre.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <lucide-icon name="globe" size="28"></lucide-icon>
+          <h3>Multi-plateformes</h3>
+          <p>YouTube, Facebook, Instagram, TikTok, Pinterest et plus.</p>
+        </div>
+        <div class="feature-card">
+          <lucide-icon name="zap" size="28"></lucide-icon>
+          <h3>Qualité adaptée</h3>
+          <p>Choisissez la résolution vidéo ou laissez en automatique.</p>
+        </div>
+        <div class="feature-card">
+          <lucide-icon name="shield" size="28"></lucide-icon>
+          <h3>Sécurisé</h3>
+          <p>Liens privés et fichiers supprimés automatiquement.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="guide">
+    <div class="container">
+      <div class="guide-grid">
+        <div class="guide-card">
+          <h2>Comment utiliser la plateforme</h2>
+          <ol>
+            <li><lucide-icon name="user" size="16"></lucide-icon> Créez un compte.</li>
+            <li><lucide-icon name="link" size="16"></lucide-icon> Collez l'URL du média.</li>
+            <li><lucide-icon name="video" size="16"></lucide-icon> Choisissez le format et la qualité.</li>
+            <li><lucide-icon name="download" size="16"></lucide-icon> Lancez et téléchargez.</li>
+          </ol>
+        </div>
+        <div class="guide-card highlight">
+          <h2>Pourquoi créer un compte</h2>
+          <ul>
+            <li><lucide-icon name="shield" size="16"></lucide-icon> Accès sécurisé à vos liens.</li>
+            <li><lucide-icon name="file-text" size="16"></lucide-icon> Historique et suivi en direct.</li>
+            <li><lucide-icon name="link" size="16"></lucide-icon> Lien direct privé pour télécharger.</li>
+          </ul>
+          <div class="guide-actions">
+            <button class="btn primary" (click)="goToAuth()" *ngIf="!isAuthenticated">Créer un compte</button>
+            <button class="btn outline" (click)="goToDownloads()" *ngIf="isAuthenticated">Aller aux téléchargements</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta">
+    <div class="container">
+      <div class="cta-content">
+        <h2>Prêt à démarrer</h2>
+        <p>
+          Un espace clair pour lancer et récupérer vos médias, sans stocker durablement sur le serveur.
+          Le lien reste disponible quelques minutes, puis le fichier est supprimé automatiquement.
+        </p>
+        <div class="cta-details">
+          <div class="cta-item">
+            <lucide-icon name="clock" size="16"></lucide-icon>
+            Lien actif pendant 5 minutes
+          </div>
+          <div class="cta-item">
+            <lucide-icon name="shield" size="16"></lucide-icon>
+            Accès privé via votre compte
+          </div>
+          <div class="cta-item">
+            <lucide-icon name="download" size="16"></lucide-icon>
+            Téléchargement direct sur votre appareil
+          </div>
+        </div>
+        <button class="btn primary large" (click)="goToAuth()" *ngIf="!isAuthenticated">
+          <lucide-icon name="rocket" size="18"></lucide-icon>
+          Créer mon compte
+        </button>
+      </div>
+    </div>
+  </div>
+</section>

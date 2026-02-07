@@ -1,0 +1,164 @@
+<div class="app-shell">
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <!-- Brand -->
+        <a class="brand" routerLink="/">
+          <div class="brand-icon">
+            <img src="assets/logo.svg" alt="MediaDL" width="40" height="40">
+          </div>
+          <div class="brand-text">
+            <div class="brand-title">MediaDL</div>
+            <div class="brand-tagline">Téléchargement intelligent</div>
+          </div>
+        </a>
+
+        <!-- Navigation -->
+        <nav class="nav">
+          <a class="nav-link"
+             routerLink="/"
+             routerLinkActive="active"
+             [routerLinkActiveOptions]="{ exact: true }">
+            <lucide-icon name="house" size="18"></lucide-icon>
+            Accueil
+          </a>
+
+          <a class="nav-link"
+             routerLink="/downloads"
+             routerLinkActive="active"
+             *ngIf="isAuthed">
+            <lucide-icon name="download" size="18"></lucide-icon>
+            Mes téléchargements
+          </a>
+
+          <a class="nav-link"
+             routerLink="/auth"
+             routerLinkActive="active"
+             *ngIf="!isAuthed">
+            <lucide-icon name="log-in" size="18"></lucide-icon>
+            Connexion
+          </a>
+        </nav>
+
+        <!-- Session -->
+        <div class="session" *ngIf="isAuthed; else guest">
+          <div class="user-info">
+            <div class="user-avatar">
+              <lucide-icon name="circle-user" size="20"></lucide-icon>
+            </div>
+            <div class="user-details">
+              <span class="user-name">{{ userLabel }}</span>
+              <span class="user-status">En ligne</span>
+            </div>
+          </div>
+          <button class="btn ghost small" type="button" (click)="logout()">
+            <lucide-icon name="log-out" size="16"></lucide-icon>
+            Déconnexion
+          </button>
+        </div>
+
+        <ng-template #guest>
+          <div class="guest-actions">
+            <a class="btn primary" routerLink="/auth">
+              <lucide-icon name="rocket" size="16"></lucide-icon>
+              Commencer
+            </a>
+          </div>
+        </ng-template>
+
+        <!-- Mobile Menu Toggle -->
+        <button class="menu-toggle" (click)="toggleMobileMenu()" aria-label="Toggle menu">
+          <lucide-icon [name]="isMobileMenuOpen ? 'x' : 'menu'" size="24"></lucide-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" [class.active]="isMobileMenuOpen">
+      <div class="mobile-menu-content" (click)="$event.stopPropagation()">
+        <button class="mobile-close" type="button" (click)="closeMobileMenu()" aria-label="Fermer le menu">
+          <lucide-icon name="x" size="20"></lucide-icon>
+        </button>
+        <a class="mobile-nav-link"
+           routerLink="/"
+           (click)="closeMobileMenu()">
+          <lucide-icon name="house" size="20"></lucide-icon>
+          Accueil
+        </a>
+
+        <a class="mobile-nav-link"
+           routerLink="/downloads"
+           (click)="closeMobileMenu()">
+          <lucide-icon name="download" size="20"></lucide-icon>
+          Mes téléchargements
+        </a>
+
+        <a class="mobile-nav-link"
+           routerLink="/auth"
+           *ngIf="!isAuthed"
+           (click)="closeMobileMenu()">
+          <lucide-icon name="log-in" size="20"></lucide-icon>
+          Connexion
+        </a>
+
+        <div class="mobile-session" *ngIf="isAuthed">
+          <div class="mobile-user-info">
+            <div class="user-avatar">
+              <lucide-icon name="circle-user" size="24"></lucide-icon>
+            </div>
+            <div class="user-details">
+              <span class="user-name">{{ userLabel }}</span>
+              <span class="user-status">Connecté</span>
+            </div>
+          </div>
+          <button class="btn primary full-width" (click)="logout(); closeMobileMenu()">
+            <lucide-icon name="log-out" size="18"></lucide-icon>
+            Se déconnecter
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <div class="brand-logo">
+            <img src="assets/logo.svg" alt="MediaDL" width="32" height="32">
+          </div>
+          <div class="brand-info">
+            <div class="brand-title">MediaDL</div>
+            <div class="brand-tagline">Téléchargements simples, rapides et privés.</div>
+          </div>
+        </div>
+
+        <div class="footer-contact">
+          <div class="contact-title">Nous contacter</div>
+          <a class="contact-link" href="https://wa.me/242068457521" target="_blank" rel="noopener">
+            <lucide-icon name="message-circle" size="18"></lucide-icon>
+            WhatsApp +242 06 845 7521
+          </a>
+          <a class="contact-link" href="https://facebook.com/your-page" target="_blank" rel="noopener">
+            <lucide-icon name="facebook" size="18"></lucide-icon>
+            Facebook (page officielle)
+          </a>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; {{ currentYear }} MediaDL. Tous droits réservés.</p>
+        <p class="footer-credit">
+          Conçu par <a href="https://cyberfusion-group.vercel.app/" target="_blank" rel="noopener">CyberFusion</a>
+        </p>
+      </div>
+    </div>
+  </footer>
+</div>

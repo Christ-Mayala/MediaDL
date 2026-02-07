@@ -1,0 +1,354 @@
+<section class="downloads-shell">
+  <div class="grid">
+    <div class="card start-card">
+      <div class="card-head">
+        <div>
+          <h2>
+            <lucide-icon name="download" size="24"></lucide-icon>
+            Nouveau téléchargement
+          </h2>
+          <p class="muted">Collez un lien, choisissez un format, puis lancez le traitement.</p>
+        </div>
+      </div>
+
+      <form class="form" [formGroup]="form" (ngSubmit)="submitStart()">
+        <div class="field">
+          <label for="url">
+            <lucide-icon name="link" size="16"></lucide-icon>
+            Lien du média
+          </label>
+          <input id="url" class="input" type="url" formControlName="url" placeholder="Ex : https://www.youtube.com/watch?v=...">
+          <div class="help-text">
+            <lucide-icon name="info" size="14"></lucide-icon>
+            Plateformes supportées : YouTube, Facebook, Instagram, TikTok, Pinterest
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label for="mediaType">
+              <lucide-icon name="play" size="16"></lucide-icon>
+              Type de média
+            </label>
+            <select id="mediaType" class="select" formControlName="mediaType">
+              <option value="video">Vidéo</option>
+              <option value="audio">Audio</option>
+              <option value="image">Image</option>
+            </select>
+          </div>
+
+          <div class="field" *ngIf="form.controls.mediaType.value === 'video'">
+            <label for="maxHeight">
+              <lucide-icon name="video" size="16"></lucide-icon>
+              Qualité vidéo
+            </label>
+            <select id="maxHeight" class="select" formControlName="maxHeight">
+              <option [value]="0">Auto (recommandé)</option>
+              <option [value]="2160">4K Ultra HD</option>
+              <option [value]="1440">Full HD+</option>
+              <option [value]="1080">Full HD</option>
+              <option [value]="720">HD</option>
+              <option [value]="480">Standard</option>
+              <option [value]="360">Basique</option>
+              <option [value]="240">Minimum</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="filename">
+              <lucide-icon name="edit-3" size="16"></lucide-icon>
+              Nom du fichier (optionnel)
+            </label>
+            <input id="filename" class="input" type="text" formControlName="filename" placeholder="Ex : ma-video">
+            <div class="help-text">
+              <lucide-icon name="info" size="14"></lucide-icon>
+              Laissez vide pour conserver le nom original
+            </div>
+          </div>
+        </div>
+
+        <div class="info-box" *ngIf="form.controls.mediaType.value !== 'video'">
+          <lucide-icon name="info" size="16"></lucide-icon>
+          <span>Qualité automatique pour l'audio et les images.</span>
+        </div>
+
+        <div class="actions">
+          <button class="btn primary large" type="submit" [disabled]="loadingStart">
+            <lucide-icon name="download" size="16" *ngIf="!loadingStart"></lucide-icon>
+            <lucide-icon name="clock" size="16" *ngIf="loadingStart"></lucide-icon>
+            <span *ngIf="!loadingStart">Lancer le téléchargement</span>
+            <span *ngIf="loadingStart">Préparation en cours...</span>
+          </button>
+          <button class="btn ghost" type="button" (click)="form.reset({ url: '', mediaType: 'video', filename: '', maxHeight: 1080 })">
+            <lucide-icon name="refresh-cw" size="16"></lucide-icon>
+            Réinitialiser
+          </button>
+        </div>
+      </form>
+
+      <div class="message success" *ngIf="lastCreatedId">
+        <lucide-icon name="circle-check-big" size="20"></lucide-icon>
+        <div>
+          <strong>Téléchargement lancé</strong>
+          <div class="muted">ID : <span class="mono">{{ lastCreatedId }}</span></div>
+        </div>
+      </div>
+
+      <div class="message error" *ngIf="startError">
+        <lucide-icon name="circle-x" size="20"></lucide-icon>
+        <div>
+          <strong>Échec du lancement</strong>
+          <div class="muted">{{ startError }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card tips-card">
+      <h3>
+        <lucide-icon name="info" size="20"></lucide-icon>
+        Repères utiles
+      </h3>
+
+      <div class="tip-section">
+        <h4>
+          <lucide-icon name="globe" size="16"></lucide-icon>
+          Plateformes supportées
+        </h4>
+        <div class="platform-list">
+          <div class="platform">
+            <lucide-icon name="youtube" size="20"></lucide-icon>
+            <div>
+              <strong>YouTube</strong>
+              <small>Vidéos et audio</small>
+            </div>
+          </div>
+          <div class="platform">
+            <lucide-icon name="facebook" size="20"></lucide-icon>
+            <div>
+              <strong>Facebook</strong>
+              <small>Vidéos et images</small>
+            </div>
+          </div>
+          <div class="platform">
+            <lucide-icon name="instagram" size="20"></lucide-icon>
+            <div>
+              <strong>Instagram</strong>
+              <small>Vidéos et images</small>
+            </div>
+          </div>
+          <div class="platform">
+            <lucide-icon name="play" size="20"></lucide-icon>
+            <div>
+              <strong>TikTok</strong>
+              <small>Vidéos</small>
+            </div>
+          </div>
+          <div class="platform">
+            <lucide-icon name="pin" size="20"></lucide-icon>
+            <div>
+              <strong>Pinterest</strong>
+              <small>Images</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tip-section">
+        <h4>
+          <lucide-icon name="circle-alert" size="16"></lucide-icon>
+          Règles de conservation
+        </h4>
+        <div class="info-list">
+          <div class="info-item">
+            <lucide-icon name="clock" size="16"></lucide-icon>
+            <span>Suppression automatique après 5 minutes.</span>
+          </div>
+          <div class="info-item">
+            <lucide-icon name="download" size="16"></lucide-icon>
+            <span>Le fichier arrive dans votre dossier Téléchargements.</span>
+          </div>
+          <div class="info-item">
+            <lucide-icon name="link" size="16"></lucide-icon>
+            <span>Le lien direct reste valide jusqu'à expiration.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card list-card" id="downloads-list">
+    <div class="list-header">
+      <div>
+        <h2>
+          <lucide-icon name="download" size="20"></lucide-icon>
+          Mes téléchargements
+        </h2>
+        <p class="muted">Actualisation automatique toutes les {{ pollIntervalMs / 1000 }} secondes</p>
+      </div>
+      <button class="btn outline" type="button" (click)="refreshNow()">
+        <lucide-icon name="refresh-cw" size="16"></lucide-icon>
+        Actualiser maintenant
+      </button>
+    </div>
+
+    <div class="message error" *ngIf="listError">
+      <lucide-icon name="circle-x" size="20"></lucide-icon>
+      <div>
+        <strong>Erreur de chargement</strong>
+        <div class="muted">{{ listError }}</div>
+      </div>
+    </div>
+
+    <div class="message error" *ngIf="actionError">
+      <lucide-icon name="circle-x" size="20"></lucide-icon>
+      <div>
+        <strong>Action impossible</strong>
+        <div class="muted">{{ actionError }}</div>
+      </div>
+    </div>
+
+    <div class="message success" *ngIf="actionSuccess">
+      <lucide-icon name="circle-check-big" size="20"></lucide-icon>
+      <div>
+        <strong>Action réussie</strong>
+        <div class="muted">{{ actionSuccess }}</div>
+      </div>
+    </div>
+
+    <div class="table" *ngIf="downloads.length; else empty">
+      <div class="table-head">
+        <div>
+          <lucide-icon name="link" size="16"></lucide-icon>
+          Source
+        </div>
+        <div>
+          <lucide-icon name="play" size="16"></lucide-icon>
+          Type
+        </div>
+        <div>
+          <lucide-icon name="globe" size="16"></lucide-icon>
+          Plateforme
+        </div>
+        <div>
+          <lucide-icon name="clock" size="16"></lucide-icon>
+          Statut
+        </div>
+        <div>
+          <lucide-icon name="calendar" size="16"></lucide-icon>
+          Date
+        </div>
+        <div>
+          <lucide-icon name="file-text" size="16"></lucide-icon>
+          Notes
+        </div>
+        <div>
+          <lucide-icon name="zap" size="16"></lucide-icon>
+          Actions
+        </div>
+      </div>
+
+      <div class="table-row" *ngFor="let item of downloads; trackBy: trackById">
+        <div class="table-cell" data-label="Source">
+          <div class="source-info">
+            <span class="source-url">{{ item.url | truncateUrl }}</span>
+            <small class="source-id">ID : {{ item._id | slice:0:8 }}</small>
+          </div>
+        </div>
+
+        <div class="table-cell" data-label="Type">
+          <span class="type-badge" [ngClass]="item.mediaType">
+            <lucide-icon [name]="getMediaTypeIcon(item.mediaType)" size="14"></lucide-icon>
+            {{ getMediaTypeLabel(item.mediaType) }}
+          </span>
+        </div>
+
+        <div class="table-cell" data-label="Plateforme">
+          <span class="platform-badge">{{ item.platform || 'Inconnue' }}</span>
+        </div>
+
+        <div class="table-cell" data-label="Statut">
+          <span class="status-badge" [ngClass]="item.jobStatus">
+            <lucide-icon [name]="getStatusIcon(item.jobStatus)" size="14"></lucide-icon>
+            {{ getStatusLabel(item.jobStatus) }}
+          </span>
+          <div class="progress-info" *ngIf="item.progress && item.jobStatus === 'running'">
+            <div class="progress-bar-small">
+              <div class="progress-fill-small" [style.width.%]="item.progress"></div>
+            </div>
+            <small>{{ item.progress }}%</small>
+          </div>
+        </div>
+
+        <div class="table-cell" data-label="Date">
+          <div class="date-info">
+            <span>{{ item.createdAt | date:'short' }}</span>
+            <small>{{ getRelativeTime(item.createdAt) }}</small>
+          </div>
+        </div>
+
+        <div class="table-cell" data-label="Notes">
+          <div class="notes-info">
+            <small *ngIf="item.error" class="error-note">
+              <lucide-icon name="circle-x" size="12"></lucide-icon>
+              {{ item.error }}
+            </small>
+            <small *ngIf="item.expiresAt" class="expire-note">
+              <lucide-icon name="clock" size="12"></lucide-icon>
+              Expire le {{ item.expiresAt | date:'short' }}
+            </small>
+          </div>
+        </div>
+
+        <div class="table-cell" data-label="Actions">
+          <div class="actions-cell">
+            <button class="btn small primary"
+                    *ngIf="item.jobStatus === 'done'"
+                    (click)="downloadFile(item)"
+                    [disabled]="actionLoading[item._id]">
+              <lucide-icon name="download" size="14"></lucide-icon>
+              Télécharger
+            </button>
+
+            <button class="btn small outline"
+                    *ngIf="item.jobStatus === 'running'"
+                    (click)="refreshOne(item._id)"
+                    [disabled]="actionLoading[item._id]">
+              <lucide-icon name="refresh-cw" size="14"></lucide-icon>
+              Vérifier
+            </button>
+
+            <button class="btn small ghost"
+                    *ngIf="item.jobStatus === 'running' || item.jobStatus === 'pending'"
+                    (click)="cancelDownload(item)"
+                    [disabled]="actionLoading[item._id]">
+              <lucide-icon name="circle-x" size="14"></lucide-icon>
+              Annuler
+            </button>
+
+            <button class="btn small danger"
+                    *ngIf="['done', 'error', 'cancelled'].includes(item.jobStatus || '')"
+                    (click)="deleteDownload(item)"
+                    [disabled]="actionLoading[item._id]">
+              <lucide-icon name="trash-2" size="14"></lucide-icon>
+              Supprimer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #empty>
+      <div class="empty-state">
+        <div class="empty-icon">
+          <lucide-icon name="download" size="24"></lucide-icon>
+        </div>
+        <h3>Aucun téléchargement</h3>
+        <p>Commencez par lancer votre premier téléchargement ci-dessus.</p>
+        <button class="btn primary" (click)="scrollToForm()">
+          <lucide-icon name="play" size="16"></lucide-icon>
+          Lancer un téléchargement
+        </button>
+      </div>
+    </ng-template>
+  </div>
+</section>
