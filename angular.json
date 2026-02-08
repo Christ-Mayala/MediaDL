@@ -54,7 +54,13 @@
             "styles": [
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [],
+            "allowedCommonJsDependencies": [
+              "@distube/ytdl-core"
+            ],
+            "externalDependencies": [
+              "@distube/ytdl-core"
+            ]
           },
           "configurations": {
             "production": {
