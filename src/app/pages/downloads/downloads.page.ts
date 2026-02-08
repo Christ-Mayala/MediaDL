@@ -127,8 +127,20 @@ export class DownloadsPageComponent implements OnInit, OnDestroy {
       // Convertir MediaType en 'video' | 'audio' pour le service
       const youtubeMediaType = mediaType === 'image' ? 'video' : mediaType;
       
-      // Lancer le téléchargement côté client
-      await this.youtubeDownloader.downloadVideo(url, filename || this.sanitizeFilename(metadata.title), youtubeMediaType);
+      // Récupérer la qualité depuis le formulaire
+      const quality = this.form.controls.maxHeight.value ? 
+        `${this.form.controls.maxHeight.value}p` : '1080p';
+      
+      // Lancer le téléchargement côté client avec progression
+      await this.youtubeDownloader.downloadVideo(
+        url, 
+        filename || this.sanitizeFilename(metadata.title), 
+        youtubeMediaType,
+        quality,
+        (progress) => {
+          this.actionSuccess = `Téléchargement: ${progress.percent}% (${progress.speed.toFixed(1)} MB/s)`;
+        }
+      );
       
       this.hideMetadataPreview();
       this.actionSuccess = `Téléchargement de "${metadata.title}" terminé !`;
